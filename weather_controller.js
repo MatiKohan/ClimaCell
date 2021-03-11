@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { getEWA } = require("./manager");
+// const { getEWA } = require("./manager");
 
 const awaitHandlerFactory = (middleware) => {
   return async (req, res, next) => {
@@ -14,24 +14,26 @@ const awaitHandlerFactory = (middleware) => {
 router.get(
   "/data",
   awaitHandlerFactory(async (req, res) => {
-    let params = req.body;
+    // let params = req.body;
+    let {lat, lon} = req.query;
 
-    const ewa = await getEWA(params);
+    const data = await getData(lat, lon);
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Accept", "application/json");
-    return res.status(200).json(ewa);
+    return res.status(200).json(data);
   })
 );
 
 router.get(
   "/summarize",
   awaitHandlerFactory(async (req, res) => {
-    let params = req.body;
+    // let params = req.body;
+    let {lat, lon} = req.query;
 
-    const ewa = await getEWA(params);
+    const summary = await getSummary(lat, lon);
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Accept", "application/json");
-    return res.status(200).json(ewa);
+    return res.status(200).json(summary);
   })
 );
 
