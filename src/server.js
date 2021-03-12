@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const MongoClient = require('mongodb').MongoClient;
+const { readCSV } = require("./utilities/csv_handler");
 
 app.use(
   bodyParser.urlencoded({
@@ -27,6 +28,8 @@ app.options("*", cors());
 //   console.log('Database created!');
 //   db.close();
 // })
+
+// const weather_forecasts = readCSV('/csv_data/file1.csv');
 
 app.use("/", routes);
 const port = process.env.PORT || 3001;

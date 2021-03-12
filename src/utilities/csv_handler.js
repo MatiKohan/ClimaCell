@@ -1,9 +1,10 @@
 const csv = require('csv-parser');
 const fs = require('fs');
+// const fileUrl = '../../csv_data/file1.csv';
 
-const readCSV = (fileUrl) => {
+const readCSV = (fileName) => {
   const results = [];
-  fs.createReadStream(fileUrl)
+  fs.createReadStream(fileName)
     .pipe(csv())
     .on('data', (row) => {
       results.push(row);
@@ -14,4 +15,5 @@ const readCSV = (fileUrl) => {
     });
 }
 
+// readCSV(fileUrl);
 module.exports = { readCSV };
