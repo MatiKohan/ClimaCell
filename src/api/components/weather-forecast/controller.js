@@ -1,15 +1,16 @@
 const db = require("./service");
 
 async function getData(req, res){
+    console.log('marias');
     const {lat, lon} = req.query;
 
     try {
         const data = await db.getData( lat, lon );
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Accept", "application/json");
-        return res.status(200).json(summary);
+        return res.status(200).json(data);
     } catch (err){
-
+        console.log(err);
     }
 }
 

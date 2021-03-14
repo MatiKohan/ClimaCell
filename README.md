@@ -1,5 +1,8 @@
 # ClimaCell
 
+## Requirements
+
+MongoDB Community Server v4.4.4
 
 ## Installation
 
