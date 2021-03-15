@@ -28,16 +28,18 @@ async function getSummary(req, res) {
 }
 
 async function addWeatherForecastsFromCSV(req, res) {
+    const name = req.body.file_name;
+
     try {
-        const data = await require('../../../utilities/csv_handler').readCSV('file2.csv');
-        // let weatherForecastArray = [];
-        // let summary;
+        const data = await require('../../../utilities/csv_handler').readCSV(name);
+        const weatherForecastArray = [];
+        // const errors = [];
         let inserted = 0;
-        
-        for ( const wf of data ){
+
+        for (const wf of data) {
             let { error, value } = validateWeatherForecast(wf);
-            if (error){
-                console.log(error);
+            if (error) {
+                // errors.push(error);
             } else {
                 let WeatherForecast = new weatherForecastModel({
                     Latitude: wf['Latitude'],
@@ -46,18 +48,21 @@ async function addWeatherForecastsFromCSV(req, res) {
                     Temperature: wf['Temperature Celsius'],
                     Precipitation: wf['Precipitation Rate mm/hr']
                 });
-                
-                if (await db.addWeatherForecasts(WeatherForecast)){
-                   inserted++;
-                }
+                weatherForecastArray.push(WeatherForecast);
+                inserted++;
             }
         }
+        let result = await db.addWeatherForecasts(weatherForecastArray)
 
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Accept", "application/json");
-        return res.status(200).json(inserted);
+        return res.status(200).json(`All ${result.insertedCount} were inserted.`);
     } catch (err) {
-        
+        if (err.code === 11000) {
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Accept", "application/json");
+            return res.status(200).json(`Only ${err.result.nInserted} out of ${err.result.result.insertedIds.length} were inserted duo to duplicates.`);
+        }
     }
 }
 

@@ -27,8 +27,13 @@ node server.js
 API endpoint:
 
 ```bash
-http://localhost:3000/weather/data
+http://localhost:3000/weather/data?lat=<lat>&lon=<lon>
+http://localhost:3000/weather/summarize?lat=<lat>&lon=<lon>
+
 http://localhost:3000/weather/summarize
+{
+    file_name: <file name with .csv>
+}
 
 ```
 

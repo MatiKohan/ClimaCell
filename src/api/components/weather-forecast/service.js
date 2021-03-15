@@ -47,12 +47,14 @@ const getSummary = async (lat, lon) => {
     })
 }
 
-const addWeatherForecasts = async (WeatherForecast) => {
+const addWeatherForecasts = async (weatherForecastsArray) => {
+    const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
-        WeatherForecast.save((err, item) => {
-            if (err && err.code !== 11000) reject(err);
-            resolve(true);
-        });
+        WeatherForecast.insertMany(weatherForecastsArray, { ordered: false, rawResult: true } ,(err, docs) => {
+            console.log('Inserting to db, it can take a while..');
+            if (err) reject(err);
+            resolve(docs);
+        })
     });
 }
 
