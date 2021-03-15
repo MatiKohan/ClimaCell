@@ -30,8 +30,8 @@ async function getSummary(req, res) {
 async function addWeatherForecastsFromCSV(req, res) {
     try {
         const data = await require('../../../utilities/csv_handler').readCSV('file2.csv');
-        let weatherForecastArray = [];
-        let summary;
+        // let weatherForecastArray = [];
+        // let summary;
         let inserted = 0;
         
         for ( const wf of data ){
@@ -47,9 +47,8 @@ async function addWeatherForecastsFromCSV(req, res) {
                     Precipitation: wf['Precipitation Rate mm/hr']
                 });
                 
-                // summary = await db.addWeatherForecasts(WeatherForecast);
                 if (await db.addWeatherForecasts(WeatherForecast)){
-                   console.log(inserted++);
+                   inserted++;
                 }
             }
         }
