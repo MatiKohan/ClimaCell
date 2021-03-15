@@ -29,7 +29,7 @@ async function getSummary(req, res) {
 
 async function addWeatherForecastsFromCSV(req, res) {
     try {
-        const data = await require('../../../utilities/csv_handler').readCSV('file1.csv');
+        const data = await require('../../../utilities/csv_handler').readCSV('file2.csv');
         let weatherForecastArray = [];
         let summary;
         let inserted = 0;

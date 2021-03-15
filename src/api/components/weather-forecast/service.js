@@ -11,41 +11,39 @@ const getData = async (lat, lon) => {
 const getSummary = async (lat, lon) => {
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
-        // const mama = WeatherForecast.aggregate().match({ Longitude: lon, Latitude: lat }).group({
-        //     _id: null, 
-        //     max: {
-        //         Temperature: { $max: "$Temperature" },
-        //         Precipitation: { $max: "$Precipitation" }
-        //     },
-        //     min: {
-        //         Temperature: { $min: "$Temperature" },
-        //         Precipitation: { $min: "$Precipitation" }
-        //     },
-        //     avg: {
-        //         Temperature: { $avg: "$Temperature" },
-        //         Precipitation: { $avg: "$Precipitation" }
-        //     }
-        // }).exec((err, docs) => {
-        //     if (err && err.code !== 11000) reject(err);
-        //     resolve(true);
-        // });
-        
-        // WeatherForecast.aggregate({
-        //     $group: {
-        //         max: {
-        //             Temperature: { $max: "$Temperature" },
-        //             Precipitation: { $max: "$Precipitation" }
-        //         },
-        //         min: {
-        //             Temperature: { $min: "$Temperature" },
-        //             Precipitation: { $min: "$Precipitation" }
-        //         },
-        //         avg: {
-        //             Temperature: { $avg: "$Temperature" },
-        //             Precipitation: { $avg: "$Precipitation" }
-        //         }
-        //     }
-        // })
+        WeatherForecast.aggregate([
+            {
+                $match: {
+                    Longitude: lon,
+                    Latitude: lat
+                }
+            }, {
+                $group: {
+                    _id: null,
+                    max: {
+                        $addToSet: {
+                            Temperature: { $max: "$Temperature" },
+                            Precipitation: { $max: "$Precipitation" }
+                        }
+                    },
+                    min: {
+                        $addToSet: {
+                            Temperature: { $min: "$Temperature" },
+                            Precipitation: { $min: "$Precipitation" }
+                        }
+                    },
+                    avg: {
+                        $addToSet: {
+                            Temperature: { $avg: "$Temperature" },
+                            Precipitation: { $avg: "$Precipitation" }
+                        }
+                    }
+                }
+            }
+        ], (err, items) => {
+            if (err) reject(err);
+            resolve(items);
+        }).exec();
     })
 }
 
