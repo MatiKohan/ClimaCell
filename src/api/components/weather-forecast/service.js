@@ -10,36 +10,43 @@ const getData = async (lat, lon) => {
 
 const getSummary = async (lat, lon) => {
     const WeatherForecast = require('./model');
+
+    lon = parseInt(lon);
+    lat = parseInt(lat)
     return new Promise((resolve, reject) => {
         WeatherForecast.aggregate([
             {
                 $match: {
                     Longitude: lon,
-                    Latitude: lat
+                    Latitude: lat,
                 }
             }, {
                 $group: {
                     _id: null,
+                    max_temp: { $max: "$Temperature" },
+                    max_prec: { $max: "$Precipitation" },
+                    min_temp: { $min: "$Temperature" },
+                    min_prec: { $min: "$Precipitation" },
+                    avg_temp: { $avg: "$Temperature" },
+                    avg_prec: { $avg: "$Precipitation" }
+                }
+            }, {
+                $project: {
                     max: {
-                        $addToSet: {
-                            Temperature: { $max: "$Temperature" },
-                            Precipitation: { $max: "$Precipitation" }
-                        }
+                        Temperature: "$max_temp",
+                        Precipitation: "$max_prec"
                     },
                     min: {
-                        $addToSet: {
-                            Temperature: { $min: "$Temperature" },
-                            Precipitation: { $min: "$Precipitation" }
-                        }
+                        Temperature: "$min_temp",
+                        Precipitation: "$min_prec"
                     },
                     avg: {
-                        $addToSet: {
-                            Temperature: { $avg: "$Temperature" },
-                            Precipitation: { $avg: "$Precipitation" }
-                        }
+                        Temperature: "$avg_temp",
+                        Precipitation: "$avg_prec"
                     }
                 }
             }
+
         ], (err, items) => {
             if (err) reject(err);
             resolve(items);
@@ -50,7 +57,7 @@ const getSummary = async (lat, lon) => {
 const addWeatherForecasts = async (weatherForecastsArray) => {
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
-        WeatherForecast.insertMany(weatherForecastsArray, { ordered: false, rawResult: true } ,(err, docs) => {
+        WeatherForecast.insertMany(weatherForecastsArray, { ordered: false, rawResult: true }, (err, docs) => {
             console.log('Inserting to db, it can take a while..');
             if (err) reject(err);
             resolve(docs);
