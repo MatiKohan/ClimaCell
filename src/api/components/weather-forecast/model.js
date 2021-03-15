@@ -1,15 +1,13 @@
-const Model = require("../model");
+const mongoose = require("mongoose");
 
-class WeatherForecastModel extends Model {
-  constructor(trait = null) {
-    super(trait);
+const weatherForecastSchema = new mongoose.Schema({
+  Longitude: Number,
+  Latitude: Number,
+  forecastTime: String,
+  Temperature: Number,
+  Precipitation: Number,
+});
 
-    this._longtitude = 0;
-    this._latitude = 0;
-    this._forecastTime = '';
-    this._temperature = 0;
-    this._precipitation = 0;
-  }
-}
+weatherForecastSchema.index({Longitude: 1, Latitude: 1, forecastTime: 1 }, {unique: true});
 
-module.exports = WeatherForecastModel;
+module.exports = mongoose.model("WeatherForecast", weatherForecastSchema);

@@ -55,12 +55,13 @@ weather_forecasts = [
 ];
 
 mongoose.connect(dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true
 })
-.then(() => console.log("Connected to the database"))
-.catch((err) => console.log("Could not connect to database"));
+  .then(() => console.log("Connected to the database"))
+  .catch((err) => console.log("Could not connect to database"));
 
 app.use("/", routes);
 const port = process.env.PORT || 3001;

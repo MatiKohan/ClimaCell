@@ -1,47 +1,69 @@
 const db = require("./service");
+const { validateWeatherForecast } = require('./validation');
+const weatherForecastModel = require('./model');
 
-async function getData(req, res){
-    console.log('marias');
-    const {lat, lon} = req.query;
-
+async function getData(req, res) {
+    const { lat, lon } = req.query;
     try {
-        const data = await db.getData( lat, lon );
+        const data = await db.getData(lat, lon);
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Accept", "application/json");
         return res.status(200).json(data);
-    } catch (err){
+    } catch (err) {
         console.log(err);
     }
 }
 
-async function getSummary(req, res){
-    const {lat, lon} = req.query;
+async function getSummary(req, res) {
+    const { lat, lon } = req.query;
 
     try {
-        const summary = await db.getSummary( lat, lon );
+        const summary = await db.getSummary(lat, lon);
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Accept", "application/json");
         return res.status(200).json(summary);
-    } catch (err){
-
+    } catch (err) {
+        console.log(err);
     }
 }
 
-async function addWeatherForecasts(req, res){
-    // const {lat, lon} = req.query;
-
+async function addWeatherForecastsFromCSV(req, res) {
     try {
-        const summary = await db.addWeatherForecasts(  );
+        const data = await require('../../../utilities/csv_handler').readCSV('file1.csv');
+        let weatherForecastArray = [];
+        let summary;
+        let inserted = 0;
+        
+        for ( const wf of data ){
+            let { error, value } = validateWeatherForecast(wf);
+            if (error){
+                console.log(error);
+            } else {
+                let WeatherForecast = new weatherForecastModel({
+                    Latitude: wf['Latitude'],
+                    Longitude: wf['Longitude'],
+                    forecastTime: wf['forecast_time'],
+                    Temperature: wf['Temperature Celsius'],
+                    Precipitation: wf['Precipitation Rate mm/hr']
+                });
+                
+                // summary = await db.addWeatherForecasts(WeatherForecast);
+                if (await db.addWeatherForecasts(WeatherForecast)){
+                   console.log(inserted++);
+                }
+            }
+        }
+
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Accept", "application/json");
-        return res.status(200).json(summary);
-    } catch (err){
-
+        return res.status(200).json(inserted);
+    } catch (err) {
+        
     }
 }
 
 module.exports = {
     getData,
     getSummary,
-    addWeatherForecasts
+    addWeatherForecastsFromCSV
 };

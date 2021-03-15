@@ -1,4 +1,4 @@
-const { getData, getSummary, addWeatherForecasts } = require("./controller");
+const { getData, getSummary, addWeatherForecastsFromCSV } = require("./controller");
 
 const router = require("express").Router();
 
@@ -14,6 +14,6 @@ const awaitHandlerFactory = (middleware) => {
 
 router.get('/data', awaitHandlerFactory(getData));
 router.get('/summarize', awaitHandlerFactory(getSummary));
-router.post('/add_weather_forecasts', awaitHandlerFactory(addWeatherForecasts));
+router.post('/add_data_from_csv', awaitHandlerFactory(addWeatherForecastsFromCSV));
 
 module.exports = router;

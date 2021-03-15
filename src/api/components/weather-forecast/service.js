@@ -1,59 +1,65 @@
-const WeatherForecast = require('./mongoose_schema');
-
-const getData = async ( lat, lon ) => {
-    try {
-        const data = WeatherForecast.find({ Latitude: lat, Longitude: lon }, 'forecastTime Temperature Precipitation');
-        console.log(data);
-        return data;
-    } catch (err) {
-        console.log( e )
-    }
-
-    return data;
+const getData = async (lat, lon) => {
+    const WeatherForecast = require('./model');
+    return new Promise((resolve, reject) => {
+        WeatherForecast.find({ Longitude: lon, Latitude: lat }, { forecastTime: 1, Temperature: 1, Precipitation: 1 }, (err, item) => {
+            if (err) reject(err);
+            resolve(item);
+        })
+    })
 }
 
-const getSummary = async ( db_client, lat, lon ) => {
-    const collection = db_client.db('climacell').collection('weather_forecasts');
-    
-    try {
-        // const summary = collection.find({ max: {$max: "Latitude"}, min: lon, avg: avg: });
-        const summary = await collection.aggregate([
-            {
-                _id: null,
-                max: {
-                    Temperature: { $max: "$Temperature"},
-                    Precipitation: { $max: "$Precipitation" }
-                },
-                min: {
-                    Temperature: { $min: "$Temperature"},
-                    Precipitation: { $min: "$Precipitation" }
-                },
-                avg: {
-                    Temperature: { $avg: "$Temperature"},
-                    Precipitation: { $avg: "$Precipitation" }
-                }
-            }
-        ]).then(data => console.log('data' + data));
-        return summary;
-    } catch (err) {
-        console.log( e );
-        return false;
-    }
+const getSummary = async (lat, lon) => {
+    const WeatherForecast = require('./model');
+    return new Promise((resolve, reject) => {
+        // const mama = WeatherForecast.aggregate().match({ Longitude: lon, Latitude: lat }).group({
+        //     _id: null, 
+        //     max: {
+        //         Temperature: { $max: "$Temperature" },
+        //         Precipitation: { $max: "$Precipitation" }
+        //     },
+        //     min: {
+        //         Temperature: { $min: "$Temperature" },
+        //         Precipitation: { $min: "$Precipitation" }
+        //     },
+        //     avg: {
+        //         Temperature: { $avg: "$Temperature" },
+        //         Precipitation: { $avg: "$Precipitation" }
+        //     }
+        // }).exec((err, docs) => {
+        //     if (err && err.code !== 11000) reject(err);
+        //     resolve(true);
+        // });
+        
+        // WeatherForecast.aggregate({
+        //     $group: {
+        //         max: {
+        //             Temperature: { $max: "$Temperature" },
+        //             Precipitation: { $max: "$Precipitation" }
+        //         },
+        //         min: {
+        //             Temperature: { $min: "$Temperature" },
+        //             Precipitation: { $min: "$Precipitation" }
+        //         },
+        //         avg: {
+        //             Temperature: { $avg: "$Temperature" },
+        //             Precipitation: { $avg: "$Precipitation" }
+        //         }
+        //     }
+        // })
+    })
 }
 
-const insertWeatherForecasts = async (db_client, weather_forecasts) => {
-    try{
-        const result = await db_client
-        .db('climacell')
-        .collection('weather_forecasts')
-        .insertMany(weather_forecasts, { ordered: false });
-    } catch (err){
-        console.log( e );
-    }
+const addWeatherForecasts = async (WeatherForecast) => {
+    return new Promise((resolve, reject) => {
+        WeatherForecast.save((err, item) => {
+            if (err && err.code !== 11000) reject(err);
+            resolve(true);
+        });
+    });
 }
 
 module.exports = {
     getData,
     getSummary,
-    insertWeatherForecasts
+    addWeatherForecasts
 }

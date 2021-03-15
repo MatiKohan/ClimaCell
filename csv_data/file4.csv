@@ -1,0 +1,4 @@
+Longitude,Latitude,forecast_time,Temperature Celsius,Precipitation Rate mm/hr
+-180,-90,2021-04-02T13:00:00,26.3,8.8
+-179.5,-90,2021-04-02T13:00:00,-6.1,6
+-179,-90,2021-04-02T13:00:00,2.9,9.4
