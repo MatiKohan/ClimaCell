@@ -1,7 +1,10 @@
 const db = require("./service");
-const { validateWeatherForecast } = require('./validation');
-const weatherForecastModel = require('./model');
 
+/**
+ * Calls getData service
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function getData(req, res) {
     const { lat, lon } = req.query;
     try {
@@ -14,6 +17,11 @@ async function getData(req, res) {
     }
 }
 
+/**
+ * Calls getSummary service
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function getSummary(req, res) {
     const { lat, lon } = req.query;
 
@@ -27,61 +35,23 @@ async function getSummary(req, res) {
     }
 }
 
-async function addWeatherForecastsFromCSV(req, res) {
-    const name = req.body.file_name;
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Accept", "application/json");
-
-    try {
-        const data = await require('../../../utilities/csv_handler').readCSV(name);
-        let weatherForecastArray = [];
-        // const errors = [];
-        let iterations = data.length;
-        let result;
-        let promiseArray = [];
-
-        for (const wf of data) {
-            let { error, value } = validateWeatherForecast(wf);
-            if (error) {
-                // errors.push(error);
-            } else {
-                let WeatherForecast = new weatherForecastModel({
-                    Latitude: wf['Latitude'],
-                    Longitude: wf['Longitude'],
-                    forecastTime: wf['forecast_time'],
-                    Temperature: wf['Temperature Celsius'],
-                    Precipitation: wf['Precipitation Rate mm/hr']
-                });
-                
-                weatherForecastArray.push(WeatherForecast);
-            }
-
-            if (!--iterations || weatherForecastArray.length >= 100 ){
-                result = db.addWeatherForecasts(weatherForecastArray);
-                promiseArray.push(result); 
-                weatherForecastArray = [];
-            }
-        }
-
-        Promise.all(promiseArray).then((values) => {
-            return res.status(200).json(`${values} were inserted.`);
-        })
-    } catch (err) {
-        res.status(500).json(err);
-    }
-}
-
+/**
+ * Proccess CSV files and calls insertion service. 
+ * @param {String} fileName 
+ */
 async function addWeatherForecastsFromCSV(fileName) {
+    const { validateWeatherForecast } = require('./validation');
+    const weatherForecastModel = require('./model');
+
     try {
         console.log(`Start processing file: ${fileName}`)
         const data = await require('../../../utilities/csv_handler').readCSV(fileName);
         let weatherForecastArray = [];
         let iterations = data.length;
         let result;
-        let promiseArray = [];
-        const insertedCounter = 0;
         let promiseCounter = 0;
 
+        //loop through csv rows
         for (const wf of data) {
             let { error } = validateWeatherForecast(wf);
             if (error) {
@@ -96,20 +66,21 @@ async function addWeatherForecastsFromCSV(fileName) {
                 });
                 
                 weatherForecastArray.push(WeatherForecast);
+
+                //Divide data to bulks of 1000 and manage insertion
                 if (!--iterations || weatherForecastArray.length >= 1000 ){
                     promiseCounter.total++;
                     result = await db.addWeatherForecasts(weatherForecastArray,promiseCounter);
 
                     promiseCounter += weatherForecastArray.length;
                     console.log(`${fileName}: Inserted ${promiseCounter}/${data.length}`)
+                    if (promiseCounter === data.length) console.log(`${fileName} fully inserted.`)
                     
                     // Clearing array
                     weatherForecastArray = [];
                 }
             }
         }
-
-
     } catch (err) {
         console.log(err);
     }

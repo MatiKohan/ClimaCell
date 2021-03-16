@@ -1,3 +1,9 @@
+/**
+ * Gets the temperature and precipitation for the give latitude and longitude
+ * @param {Number} lat 
+ * @param {Number} lon 
+ * @returns Promise
+ */
 const getData = async (lat, lon) => {
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
@@ -8,6 +14,12 @@ const getData = async (lat, lon) => {
     })
 }
 
+/**
+ * Gets the max/min/avg temperature and precipitation for the give latitude and longitude
+ * @param {Number} lat 
+ * @param {Number} lon 
+ * @returns 
+ */
 const getSummary = async (lat, lon) => {
     const WeatherForecast = require('./model');
 
@@ -55,8 +67,13 @@ const getSummary = async (lat, lon) => {
     })
 }
 
-const duplicateErrorCode = 11000;
+/**
+ * Inserts a Weather Forecasts array into weatherforecasts collection
+ * @param {Array} weatherForecastsArray 
+ * @returns Promise
+ */
 const addWeatherForecasts = async (weatherForecastsArray) => {
+    const duplicateErrorCode = 11000;
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
         WeatherForecast.insertMany(weatherForecastsArray, { ordered: false, rawResult: true }, (err, docs) => {
@@ -66,13 +83,8 @@ const addWeatherForecasts = async (weatherForecastsArray) => {
     });
 }
 
-const checkIfCollectionExists = async (collectionName) => {
-    
-}
-
 module.exports = {
     getData,
     getSummary,
-    addWeatherForecasts,
-    checkIfCollectionExists
+    addWeatherForecasts
 }
