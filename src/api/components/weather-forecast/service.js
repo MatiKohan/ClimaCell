@@ -1,7 +1,7 @@
 const getData = async (lat, lon) => {
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
-        WeatherForecast.find({ Longitude: lon, Latitude: lat }, { forecastTime: 1, Temperature: 1, Precipitation: 1 }, (err, item) => {
+        WeatherForecast.find({ Longitude: lon, Latitude: lat }, { _id: 0, forecastTime: 1, Temperature: 1, Precipitation: 1 }, (err, item) => {
             if (err) reject(err);
             resolve(item);
         })
@@ -32,6 +32,7 @@ const getSummary = async (lat, lon) => {
                 }
             }, {
                 $project: {
+                    _id: 0,
                     max: {
                         Temperature: "$max_temp",
                         Precipitation: "$max_prec"
