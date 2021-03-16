@@ -19,7 +19,7 @@ app.use(cors());
 
 app.options("*", cors());
 
-const dbUrl = 'mongodb://localhost:27017/mydb';
+const dbUrl = process.env.MONGODB_URI || 'mongodb+srv://matias:matias@climacellcluster.aj159.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
@@ -28,7 +28,7 @@ mongoose.connect(dbUrl, {
   useCreateIndex: true
 })
   .then(() => console.log("Connected to the database"))
-  .catch((err) => console.log("Could not connect to database"));
+  .catch((err) => console.log("Could not connect to database" + err));
 
 app.use("/", routes);
 const port = process.env.PORT || 3001;
