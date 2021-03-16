@@ -55,19 +55,24 @@ const getSummary = async (lat, lon) => {
     })
 }
 
+const duplicateErrorCode = 11000;
 const addWeatherForecasts = async (weatherForecastsArray) => {
     const WeatherForecast = require('./model');
     return new Promise((resolve, reject) => {
         WeatherForecast.insertMany(weatherForecastsArray, { ordered: false, rawResult: true }, (err, docs) => {
-            console.log('Inserting to db, it can take a while..');
-            if (err) reject(err);
-            resolve(docs);
+            if (err && err.code !== duplicateErrorCode) reject(err);
+            resolve(true);
         })
     });
+}
+
+const checkIfCollectionExists = async (collectionName) => {
+    
 }
 
 module.exports = {
     getData,
     getSummary,
-    addWeatherForecasts
+    addWeatherForecasts,
+    checkIfCollectionExists
 }
